@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Flame, ShieldAlert, Coins, Skull, ArrowRight, Calendar, FileText } from "lucide-react";
 import { createClient } from '@/utils/supabase/server'
+import CompanyInfo from "@/components/company-info";
 
 export default async function Home() {
   const supabase = await createClient()
@@ -196,7 +197,7 @@ export default async function Home() {
       <footer className="py-10 text-center border-t border-white/5 bg-black">
         <div className="container mx-auto px-4 space-y-4">
             <p className="text-gray-600 text-sm">
-                &copy; 2025 OliwierBogdańskiZtejStrony Sp. z o.o. | Powered by <span className="text-green-600 font-bold">Sztywny Kod</span>
+                &copy; 2025 OliwierBogdańskiZtejStrony Sp. z o.o. | Powered by <CompanyInfo />
             </p>
             <div className="max-w-2xl mx-auto border border-zinc-800 bg-zinc-900/50 p-4 rounded-lg">
                 <p className="text-xs text-zinc-500 uppercase font-bold mb-1">Nota Prawna</p>
