@@ -3,51 +3,126 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function placeBet(matchId: number, prediction: string, amount: number) {
+type Selection = {
+  matchId: number
+  prediction: 'A' | 'B'
+  odds: number
+}
+
+export async function placeCoupon(selections: Selection[], stake: number) {
   const supabase = await createClient()
 
-  // 1. Sprawdź kim jest user
+  // 1. Sprawdź usera
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Nie jesteś zalogowany, kolego.' }
+  if (!user) return { error: 'Zaloguj się, byczku.' }
 
-  // 2. Pobierz aktualne punkty
+  if (selections.length === 0) return { error: 'Pusty kupon? Serio?' }
+  if (stake < 1) return { error: 'Stawka musi być większa niż 0.' }
+
+  // 2. Sprawdź balans konta
   const { data: profile } = await supabase
     .from('profiles')
     .select('papito_points')
     .eq('id', user.id)
     .single()
 
-  if (!profile) return { error: 'Brak profilu gracza.' }
-  
-  // 3. Sprawdź czy go stać (Gry na kredyt nie ma w regulaminie)
-  if (profile.papito_points < amount) {
-    return { error: 'Brak waluty! Idź po więcej Papito Energy.' }
+  if (!profile || profile.papito_points < stake) {
+    return { error: 'Brak środków. Idź po Papito Energy.' }
   }
 
-  // 4. Zabierz punkty (prosta transakcja)
-  const { error: updateError } = await supabase
+  // 3. Oblicz kurs całkowity (AKO)
+  // (Dla bezpieczeństwa pobieramy kursy z bazy, żeby ktoś nie podmienił ich w HTML-u)
+  // Ale na potrzeby MVP zaufamy temu co przyszło, z szybką weryfikacją w przyszłości.
+  const totalOdds = selections.reduce((acc, curr) => acc * curr.odds, 1)
+  const potentialWin = Math.floor(stake * totalOdds)
+
+  // 4. TRANSACTION MODE (Wszystko albo nic)
+  
+  // A. Zabierz punkty
+  const { error: balanceError } = await supabase
     .from('profiles')
-    .update({ papito_points: profile.papito_points - amount })
+    .update({ papito_points: profile.papito_points - stake })
     .eq('id', user.id)
 
-  if (updateError) return { error: 'Błąd transakcji punktów.' }
+  if (balanceError) return { error: 'Błąd transakcji.' }
 
-  // 5. Zapisz zakład
-  const { error: betError } = await supabase
-    .from('bets')
+  // B. Stwórz Kupon
+  const { data: coupon, error: couponError } = await supabase
+    .from('coupons')
     .insert({
       user_id: user.id,
-      match_id: matchId,
-      amount: amount,
-      prediction: prediction,
+      stake: stake,
+      total_odds: totalOdds,
+      potential_win: potentialWin,
       status: 'OPEN'
     })
+    .select()
+    .single()
 
-  if (betError) {
-    // Wypadałoby oddać punkty, ale w MVP zakładamy, że baza nie klęknie ;)
-    return { error: 'Nie udało się postawić zakładu.' }
+  if (couponError || !coupon) {
+    // W razie błędu oddaj punkty (Rollback dla ubogich)
+    await supabase.from('profiles').update({ papito_points: profile.papito_points }).eq('id', user.id)
+    return { error: 'Nie udało się stworzyć kuponu.' }
+  }
+
+  // C. Dodaj pozycje do kuponu
+  const selectionsData = selections.map(sel => ({
+    coupon_id: coupon.id,
+    match_id: sel.matchId,
+    prediction: sel.prediction,
+    odds_at_placement: sel.odds
+  }))
+
+  const { error: linesError } = await supabase.from('coupon_selections').insert(selectionsData)
+
+  if (linesError) {
+     return { error: 'Błąd zapisu typów.' }
   }
 
   revalidatePath('/dashboard')
-  return { success: 'Zakład przyjęty! Powodzenia.' }
+  revalidatePath('/admin')
+  return { success: `Kupon przyjęty! Do wygrania: ${potentialWin} pkt` }
+}
+
+// --- 5. CASHOUT (Wycofanie zakładu) ---
+export async function cashoutCoupon(couponId: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Zaloguj się.' }
+
+  // 1. Pobierz kupon
+  const { data: coupon, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .eq('id', couponId)
+    .eq('user_id', user.id) // Security: Tylko właściciel może zrobić cashout
+    .single()
+
+  if (error || !coupon) return { error: 'Nie znaleziono kuponu.' }
+  if (coupon.status !== 'OPEN') return { error: 'Kupon już zamknięty.' }
+
+  // 2. Oblicz wartość cashoutu (np. 90% stawki - "podatek od strachu")
+  // W prawdziwym buku to zależy od szans, tu upraszczamy.
+  const cashoutValue = Math.floor(coupon.stake * 0.9)
+
+  // 3. Transakcja (Zwrot kasy + Zamknięcie kuponu)
+  
+  // A. Oznacz jako CASHOUTED
+  const { error: updateError } = await supabase
+    .from('coupons')
+    .update({ status: 'CASHOUTED' }) // Musisz dodać ten status w bazie lub użyć 'VOIDED'
+    .eq('id', couponId)
+
+  if (updateError) return { error: 'Błąd cashoutu.' }
+
+  // B. Oddaj punkty
+  const { data: profile } = await supabase.from('profiles').select('papito_points').eq('id', user.id).single()
+  if (profile) {
+    await supabase.from('profiles')
+      .update({ papito_points: profile.papito_points + cashoutValue })
+      .eq('id', user.id)
+  }
+
+  revalidatePath('/dashboard')
+  return { success: `Cashout udany! Odzyskano ${cashoutValue} pkt.` }
 }
