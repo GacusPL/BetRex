@@ -70,12 +70,17 @@ export default async function AdminPage() {
     <div className="min-h-screen bg-zinc-950 text-white p-4 pb-20">
       <header className="max-w-6xl mx-auto mb-10 border-b border-zinc-800 pb-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-           <h1 className="text-4xl font-black text-green-500 tracking-tighter">PANEL BOGA v2.0</h1>
+           <h1 className="text-4xl font-black text-green-500 tracking-tighter">PANEL PREZESA v2.0</h1>
            <p className="text-gray-400">Zarządzanie turniejem TREX CUP</p>
         </div>
         <div className="flex gap-2">
             <Link href="/dashboard">
-                <Button variant="outline" className="border-zinc-700">Podgląd Gracza</Button>
+<Button 
+                  variant="outline" 
+                  className="border-zinc-700 text-black/100 hover:text-zinc-400 hover:border-zinc-300 transition-colors"
+                >
+                  Podgląd Gracza
+                </Button>
             </Link>
         </div>
       </header>
@@ -233,7 +238,7 @@ export default async function AdminPage() {
                                 <form action={manageCoupon} className="w-full">
                                     <input type="hidden" name="couponId" value={coupon.id} />
                                     <input type="hidden" name="action" value="VOID" />
-                                    <Button size="sm" variant="outline" className="w-full border-zinc-600 text-gray-300 hover:bg-zinc-800 text-xs">
+                                    <Button size="sm" variant="outline" className="w-full border-zinc-600 text-gray-700 hover:bg-zinc-800 text-xs">
                                         <RotateCcw className="w-3 h-3 mr-1"/> ZWROT
                                     </Button>
                                 </form>

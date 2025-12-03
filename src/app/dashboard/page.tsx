@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import BettingSystem from '@/components/betting-system'
 import UserCouponsList from '@/components/user-coupons'
-import { Zap, LogOut } from 'lucide-react'
+import { Zap, LogOut, Skull } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 
@@ -29,8 +29,7 @@ export default async function DashboardPage() {
     .eq('status', 'ACTIVE')
     .order('created_at', { ascending: false })
 
-  // 4. Pobierz Kupony (Z logowaniem błędów)
-  // Uproszczone zapytanie - Supabase czasem głupieje przy potrójnym zagnieżdżeniu
+  // 4. Pobierz Kupony
   const { data: myCoupons, error: couponsError } = await supabase
     .from('coupons')
     .select(`
@@ -64,7 +63,7 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-2 bg-green-900/20 border border-green-500/30 px-3 py-1.5 rounded-full">
               <Zap className="w-4 h-4 text-green-500 fill-green-500" />
               <span className="font-bold text-green-400">{profile?.papito_points ?? 0}</span>
-              <span className="text-xs text-green-600 font-bold uppercase hidden sm:inline">Papito Power</span>
+              <span className="text-xs text-green-600 font-bold uppercase hidden sm:inline">Rex Coins</span>
             </div>
             
             {profile?.is_admin && (
@@ -95,8 +94,15 @@ export default async function DashboardPage() {
         />
 
         {/* HISTORIA KUPONÓW */}
-        {/* Przekazujemy dane lub pustą tablicę, żeby komponent nie wybuchł */}
         <UserCouponsList coupons={myCoupons || []} />
+
+        {/* OSTRZEŻENIE NA DOLE */}
+        <div className="mt-12 text-center border-t border-zinc-800 pt-8">
+            <p className="text-xs text-zinc-600 flex items-center justify-center gap-2">
+                <Skull className="w-4 h-4 text-red-900"/>
+                Pamiętaj: Próby oszustwa zakończą się banem i liściem na ogarkę.
+            </p>
+        </div>
 
       </main>
     </div>

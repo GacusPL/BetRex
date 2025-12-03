@@ -27,7 +27,7 @@ export async function placeCoupon(selections: Selection[], stake: number) {
     .single()
 
   if (!profile || profile.papito_points < stake) {
-    return { error: 'Brak środków. Idź po Papito Energy.' }
+    return { error: 'Brak środków. Idź po Rex Coins.' }
   }
 
   // 3. Oblicz kurs całkowity (AKO)
@@ -124,5 +124,5 @@ export async function cashoutCoupon(couponId: number) {
   }
 
   revalidatePath('/dashboard')
-  return { success: `Cashout udany! Odzyskano ${cashoutValue} pkt.` }
+  return { success: `Cashout udany! Odzyskano ${cashoutValue} REX.` }
 }

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Zap, ArrowLeft } from "lucide-react"
+import { Zap, ArrowLeft, LifeBuoy } from "lucide-react"
 
 export default async function LoginPage({
   searchParams,
@@ -93,15 +93,32 @@ export default async function LoginPage({
                     <Input id="password" name="password" type="password" required minLength={6} placeholder="Minimum 6 znaków" className="bg-zinc-900 border-zinc-700 text-white placeholder:text-gray-400 focus:border-green-500" />
                   </div>
                   <Button formAction={signup} className="w-full bg-white hover:bg-gray-200 text-black font-bold mt-2">
-                    Dołącz do ekipy (Odbierz 1000 pkt)
+                    Dołącz do ekipy (Odbierz 10000 REX)
                   </Button>
                 </div>
               </form>
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="text-center text-xs text-gray-500 flex justify-center">
-            Logując się akceptujesz "Klauzulę Liścia" [Reg. §7].
+<CardFooter className="flex flex-col gap-4">
+            <div className="text-center text-xs text-gray-500 w-full">
+                Logując się akceptujesz "Klauzulę Liścia" [Reg. §7].
+            </div>
+
+            {/* NOWA SEKCJA WSPARCIA */}
+            <div className="w-full border-t border-zinc-800 pt-4 mt-2">
+                <div className="flex items-start gap-3 bg-zinc-900/50 p-3 rounded border border-zinc-800">
+                    <LifeBuoy className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
+                    <div className="text-xs text-gray-400">
+                        <p className="font-bold text-gray-300 mb-1">Problem z kontem / logowaniem?</p>
+                        <p>Pisz do Głównego Programisty:</p>
+                        <p className="text-green-500 font-bold mt-1">Sztywny Kod</p>
+                        <a href="mailto:21306@student.ans-elblag.pl" className="block text-zinc-300 hover:text-white hover:underline mt-0.5 break-all">
+                            21306@student.ans-elblag.pl
+                        </a>
+                    </div>
+                </div>
+            </div>
         </CardFooter>
       </Card>
     </div>

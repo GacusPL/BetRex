@@ -150,7 +150,7 @@ export async function manageCoupon(formData: FormData) {
           .eq('id', coupon.user_id)
       }
       revalidatePath('/admin')
-      return { success: `Wypłacono ${coupon.potential_win} pkt graczowi.` }
+      return { success: `Wypłacono ${coupon.potential_win} REX graczowi.` }
     }
 
     if (action === 'VOID') {

@@ -52,7 +52,6 @@ export default async function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-green-600/20 blur-[120px] rounded-full pointer-events-none" />
         
         <div className="container mx-auto px-4 text-center relative z-10">
-          {/* ZMIANA SPONSORA */}
           <Badge className="mb-6 bg-yellow-500 text-black hover:bg-yellow-400 font-bold px-4 py-1 text-md animate-in fade-in zoom-in duration-1000">
             SPONSOR STRATEGICZNY: SZTYWNE GITY
           </Badge>
@@ -60,7 +59,7 @@ export default async function Home() {
             TREX <span className="text-gradient">CUP</span> 2025
           </h1>
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Jedyny taki turniej. Pula nagród: <span className="text-white font-bold">1 000 000 PKT</span>. 
+            Jedyny taki turniej. Pula nagród: <span className="text-white font-bold">1 000 000 REX</span>. 
             Zasady są proste: grasz na charakter albo dostajesz liścia.
           </p>
           
@@ -70,7 +69,6 @@ export default async function Home() {
                 <Flame className="mr-2 h-5 w-5" /> OBSTAWIAJ TERAZ
               </Button>
             </Link>
-            {/* PRZYWRÓCONY PRZYCISK REGULAMINU */}
             <a href="/Regulamin_T-Rex_Cup.pdf" target="_blank" rel="noopener noreferrer">
                <Button size="lg" variant="secondary" className="h-14 px-8 text-lg w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white">
                  <FileText className="mr-2 h-5 w-5"/> CZYTAJ REGULAMIN
@@ -92,7 +90,6 @@ export default async function Home() {
                 </div>
                 NA ŻYWO / NADCHODZĄCE
                 </h2>
-                {/* PRZYWRÓCONA INFORMACJA O KURSACH */}
                 <p className="text-gray-500 text-sm mt-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-green-500"></span>
                     Kursy aktualizowane przez Prezesa
@@ -140,12 +137,12 @@ export default async function Home() {
                         <CardContent>
                             <div className="grid grid-cols-2 gap-3">
                                 <Link href="/dashboard" className="w-full">
-                                    <Button variant="outline" className="w-full border-zinc-800 hover:bg-green-900/20 hover:text-green-400 hover:border-green-900/50 h-12 text-lg font-bold bg-zinc-900/50">
+                                    <Button variant="outline" className="w-full border-zinc-800 text-white hover:bg-green-900/20 hover:text-green-400 hover:border-green-900/50 h-12 text-lg font-bold bg-zinc-900/50">
                                         {match.odds_a.toFixed(2)}
                                     </Button>
                                 </Link>
                                 <Link href="/dashboard" className="w-full">
-                                    <Button variant="outline" className="w-full border-zinc-800 hover:bg-green-900/20 hover:text-green-400 hover:border-green-900/50 h-12 text-lg font-bold bg-zinc-900/50">
+                                    <Button variant="outline" className="w-full border-zinc-800 text-white hover:bg-green-900/20 hover:text-green-400 hover:border-green-900/50 h-12 text-lg font-bold bg-zinc-900/50">
                                         {match.odds_b.toFixed(2)}
                                     </Button>
                                 </Link>
@@ -173,10 +170,9 @@ export default async function Home() {
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-yellow-500/30 transition duration-300">
             <Coins className="w-12 h-12 mx-auto text-yellow-500 mb-4" />
-            {/* ZMIANA WALUTY NA PUNKTY */}
-            <h3 className="text-xl font-bold mb-2">Pula: Wirtualne Punkty</h3>
+            <h3 className="text-xl font-bold mb-2">Pula: Rex Coins</h3>
             <p className="text-gray-400 text-sm">
-              Grasz o prestiż i szacunek ludzi ulicy. Punkty nie mają wartości pieniężnej.
+              Grasz o prestiż i szacunek ludzi ulicy. Rex Coins nie mają wartości pieniężnej.
             </p>
           </div>
           <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-green-500/30 transition duration-300">
@@ -196,7 +192,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* --- FOOTER (ZMODYFIKOWANY) --- */}
+      {/* --- FOOTER --- */}
       <footer className="py-10 text-center border-t border-white/5 bg-black">
         <div className="container mx-auto px-4 space-y-4">
             <p className="text-gray-600 text-sm">
@@ -206,8 +202,8 @@ export default async function Home() {
                 <p className="text-xs text-zinc-500 uppercase font-bold mb-1">Nota Prawna</p>
                 <p className="text-xs text-zinc-400 leading-relaxed">
                     To nie jest prawdziwa strona bukmacherska. Serwis służy wyłącznie do celów rozrywkowych (turniej T-REX CUP). 
-                    Użytkownicy operują wyłącznie wirtualną walutą (punkty), która nie posiada pokrycia w prawdziwym pieniądzu i nie może być wymieniana na gotówkę.
-                    Hazard uzależnia, ale tutaj grasz o możliwość zagrania skrzydlaka z prezesem i uścisk dłoni.
+                    Użytkownicy operują wyłącznie wirtualną walutą (Rex Coins), która nie posiada pokrycia w prawdziwym pieniądzu i nie może być wymieniana na gotówkę.
+                    Hazard uzależnia, ale tutaj grasz o pietruszkę i uścisk dłoni Prezesa.
                 </p>
             </div>
         </div>

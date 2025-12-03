@@ -6,10 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { placeCoupon } from '@/app/dashboard/actions'
-import { Zap, Trash2, Ticket, CheckCircle } from 'lucide-react'
+import { Zap, Trash2, Ticket, AlertTriangle } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 
-// Typy danych
 type Match = {
   id: number
   game_name: string
@@ -31,8 +30,8 @@ type Duel = {
 type Selection = {
   matchId: number
   gameName: string
-  prediction: 'A' | 'B' // Kogo obstawił?
-  teamName: string // Nazwa drużyny dla wyświetlania
+  prediction: 'A' | 'B'
+  teamName: string
   odds: number
 }
 
@@ -41,20 +40,14 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
   const [stake, setStake] = useState<number>(100)
   const [loading, setLoading] = useState(false)
 
-  // --- LOGIKA KUPONU ---
-  
-  // Dodawanie/Usuwanie typu
   const toggleSelection = (match: Match, prediction: 'A' | 'B') => {
-    // 1. Sprawdź czy mecz już jest na kuponie
     const existingIndex = coupon.findIndex(s => s.matchId === match.id)
     
-    // Jeśli kliknąłeś to samo -> usuń (odznacz)
     if (existingIndex >= 0 && coupon[existingIndex].prediction === prediction) {
       setCoupon(coupon.filter((_, i) => i !== existingIndex))
       return
     }
 
-    // Jeśli kliknąłeś przeciwny typ w tym samym meczu -> podmień
     const newSelection: Selection = {
       matchId: match.id,
       gameName: match.game_name,
@@ -72,11 +65,9 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
     }
   }
 
-  // Obliczenia
   const totalOdds = coupon.reduce((acc, curr) => acc * curr.odds, 1)
   const potentialWin = Math.floor(stake * totalOdds)
 
-  // Wysyłanie
   const handlePlaceCoupon = async () => {
     if (stake <= 0) return alert('Za darmo to uczciwa cena, ale nie tutaj.')
     
@@ -91,14 +82,14 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
       alert(`BŁĄD: ${result.error}`)
     } else {
       alert(`POSZŁO! ${result.success}`)
-      setCoupon([]) // Wyczyść kupon po sukcesie
+      setCoupon([])
     }
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       
-      {/* --- LEWA KOLUMNA: OFERTA (MECZE) --- */}
+      {/* --- LEWA KOLUMNA: OFERTA --- */}
       <div className="lg:col-span-2 space-y-8">
         {initialDuels?.map((duel) => (
           <div key={duel.id} className="space-y-4">
@@ -116,8 +107,6 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
                     {match.status === 'LIVE' && <div className="absolute top-0 right-0 bg-red-600 text-white text-xs px-2 py-1 font-bold animate-pulse">LIVE</div>}
                     
                     <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                      
-                      {/* Info o meczu */}
                       <div className="flex-1 text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
                            <Badge variant="outline" className="border-green-900 text-green-500 text-[10px]">{match.game_name}</Badge>
@@ -129,7 +118,6 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
                         {match.handicap && <div className="text-blue-400 text-xs mt-1">Handicap: {match.handicap}</div>}
                       </div>
 
-                      {/* Kursy (Przyciski) */}
                       {match.status !== 'FINISHED' && (
                         <div className="flex gap-2 w-full md:w-auto">
                           <Button 
@@ -167,7 +155,7 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
         ))}
       </div>
 
-      {/* --- PRAWA KOLUMNA: BET SLIP (KUPON) --- */}
+      {/* --- PRAWA KOLUMNA: BET SLIP --- */}
       <div className="lg:col-span-1 lg:sticky lg:top-24">
         <Card className="bg-black border-yellow-600/30 shadow-2xl overflow-hidden">
           <CardHeader className="bg-yellow-600/10 border-b border-yellow-600/20 pb-3">
@@ -179,7 +167,6 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
           
           <CardContent className="p-4 space-y-4">
             
-            {/* Lista typów na kuponie */}
             {coupon.length > 0 ? (
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                 {coupon.map((sel, idx) => (
@@ -207,7 +194,6 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
 
             <Separator className="bg-zinc-800" />
 
-            {/* Podsumowanie i Stawka */}
             <div className="space-y-3">
                 <div className="flex justify-between text-sm text-gray-400">
                     <span>Kurs całkowity (AKO):</span>
@@ -227,7 +213,13 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
 
                 <div className="flex justify-between items-center bg-green-900/20 p-3 rounded border border-green-900/50">
                     <span className="text-xs text-green-400 uppercase font-bold">Ewentualna wygrana:</span>
-                    <span className="text-xl font-black text-green-400">{potentialWin}</span>
+                    <span className="text-xl font-black text-green-400">{potentialWin} REX</span>
+                </div>
+
+                {/* OSTRZEŻENIE O KLAUZULI LIŚCIA */}
+                <div className="flex items-start gap-2 bg-red-950/30 p-2 rounded border border-red-900/50 text-red-400 text-[10px] leading-tight">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <p>Próby oszustwa (bugowanie, multikonta) podlegają pod <span className="font-bold underline">KLAUZULĘ LIŚCIA</span> (§7) i kończą się banem.</p>
                 </div>
 
                 <Button 
@@ -238,7 +230,7 @@ export default function BettingSystem({ initialDuels, userPoints }: { initialDue
                     {loading ? 'Wysyłanie...' : 'POSTAW ZAKŁAD'}
                 </Button>
                 <div className="text-center text-[10px] text-gray-500">
-                    Dostępne środki: <span className="text-white">{userPoints}</span> pkt
+                    Dostępne środki: <span className="text-white">{userPoints}</span> REX
                 </div>
             </div>
 
